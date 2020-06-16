@@ -43,13 +43,14 @@ app.get("/repositories", (request, response) => {
 });
 
 app.post("/repositories", (request, response) => {
-  const { title, git } = request.body
+  const { title, url, techs } = request.body
 
     const repo = {
       id: uuid(),
       title: title,
-      github: git,
-      liked: false
+      url: url,
+      techs: techs,
+      likes: 0
     }
     repositories.push(repo)
     response.json(repo)
@@ -57,7 +58,7 @@ app.post("/repositories", (request, response) => {
 
 app.put("/repositories/:id", (request, response) => {
   const { id } = request.params;
-  const { title, git, liked } = request.body
+  const { title, url, techs } = request.body
 
   const repoIndex = repositories.findIndex(project => project.id === id)
 
@@ -69,8 +70,9 @@ app.put("/repositories/:id", (request, response) => {
   const project = {
     id,
     title,
-    git,
-    liked
+    url,
+    techs,
+    likes: repositories[repoIndex].likes
   }
   repositories[repoIndex] = project;
 
@@ -101,7 +103,7 @@ app.post("/repositories/:id/like", (request, response) => {
       .json({error: "Project not found!!"})
   }
 
-  repositories[repoIndex].liked = true;
+  repositories[repoIndex].likes += 1;
 
   return response.json(repositories[repoIndex])
 });
