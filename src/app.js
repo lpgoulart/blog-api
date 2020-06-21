@@ -30,7 +30,20 @@ function validateId(request, response, next) {
 app.use(logRequest)
 app.use('/repositories/:id', validateId)
 
-const repositories = [];
+const repositories = [
+  {
+    "id": "814dcafc-d5cb-4815-b5eb-f3b5193a5e3f",
+    "title": "Project",
+    "url": "github.com/lpgoulart/project",
+    "techs": [
+      "JS",
+      "CSS",
+      "HTML"
+    ],
+    "img": "./assets/mexico.png",
+    "likes": 0
+  }
+];
 
 app.get("/repositories", (request, response) => {
 
