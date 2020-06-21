@@ -40,7 +40,7 @@ const repositories = [
       "CSS",
       "HTML"
     ],
-    "img": "./assets/mexico.png",
+    "image": "mexico.png",
     "likes": 0
   }
 ];
