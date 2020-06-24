@@ -28,22 +28,6 @@ function validateId(request, response, next) {
 app.use(logRequest)
 app.use('/repositories/:id', validateId)
 
-/*
-* ex de data
-
-{
-  id
-  content_type
-  name
-  posts : {
-    total
-    items: []
-  }
-  pages?
-}
-
-
-*/ 
 const users = [];
 
 // Get all users
@@ -55,8 +39,10 @@ app.get("/api/users", (request, response) => {
     ? users.filter(projetc => project.title.includes(title))
     : users
 
-  return response.json(result)
+  return response.status(200).json(result)
 });
+
+
 // Get single users
 // OK
 app.get("/api/users/:id", (request, response) => {
@@ -74,16 +60,42 @@ app.get("/api/users/:id", (request, response) => {
 
   return response.json(result)
 });
+// Get Single User Post
+// OK
+app.get("/api/users/:id/:postId", (request, response) => {
+  const { id, postId } = request.params;
+
+  const userIndex = users.findIndex(user => user.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "User not found!!"})
+  }
+
+  const postIndex = users[userIndex].posts.items.findIndex( post => post.id === postId )
+
+  if( postIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Post not found!!"})
+  }
+
+  post = users[userIndex].posts.items[postIndex]
+
+  return response.json(post);
+});
+
+
 // Add new User
 // OK
 app.post("/api/users", (request, response) => {
-  const { name, content_type, posts } = request.body
+  const { name, content_type, username, posts } = request.body
 
     const _user = {
       id: uuid(),
-      name: name,
-      content_type: content_type,
-      posts: posts,
+      name,
+      username, 
+      content_type,
+      posts,
     }
     users.push(_user)
     response.json(_user)
@@ -116,11 +128,13 @@ app.post("/api/users/:id/post", (request, response) => {
   response.json(_post)
 
 });
+
+
 // Edit User Info
 // OK
 app.put("/api/users/:id", (request, response) => {
   const { id } = request.params;
-  const { name, content_type } = request.body;
+  const { name, content_type, username } = request.body;
 
   const userIndex = users.findIndex(project => project.id === id)
 
@@ -131,6 +145,7 @@ app.put("/api/users/:id", (request, response) => {
 
   const userUpdated = {
     id,
+    username: username == "" ? users[userIndex].username : username,
     name: name == "" ? users[userIndex].name : name,
     content_type: content_type == "" ? users[userIndex].content_type : content_type,
     posts: users[userIndex].posts
@@ -171,6 +186,8 @@ app.put("/api/users/:id/:postId", (request, response) => {
 
   return response.json(users[userIndex])
 });
+
+
 // Delete Users
 // OK
 app.delete("/api/users/:id", (request, response) => {
@@ -209,28 +226,6 @@ app.delete("/api/users/:id/:postId", (request, response) => {
   users[userIndex].posts.items.splice(postIndex, 1);
   return response.status(204).send();
 });
-// Delete User Post
-// OK
-app.get("/api/users/:id/:postId", (request, response) => {
-  const { id, postId } = request.params;
 
-  const userIndex = users.findIndex(user => user.id === id)
-
-  if( userIndex < 0 ) {
-    return response.status(400)
-      .json({error: "User not found!!"})
-  }
-
-  const postIndex = users[userIndex].posts.items.findIndex( post => post.id === postId )
-
-  if( postIndex < 0 ) {
-    return response.status(400)
-      .json({error: "Post not found!!"})
-  }
-
-  post = users[userIndex].posts.items[postIndex]
-
-  return response.json(post);
-});
 
 module.exports = app;
