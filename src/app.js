@@ -20,13 +20,13 @@ function validateId(request, response, next) {
   const {id} = request.params;
 
   if ( !isUuid(id) ) {
-    return response.status(400).json({message:"Invalid project ID!!"})
+    return response.status(400).json({message:"Invalid ID!!"})
   }
 
   return next()
 }
 app.use(logRequest)
-app.use('/repositories/:id', validateId)
+app.use('/api/users/:id', validateId)
 
 const users = [];
 
@@ -36,7 +36,7 @@ app.get("/api/users", (request, response) => {
 
   const {title} = request.query;
   const result = title
-    ? users.filter(projetc => project.title.includes(title))
+    ? users.filter(user => user.title.includes(title))
     : users
 
   return response.status(200).json(result)
@@ -49,11 +49,11 @@ app.get("/api/users/:id", (request, response) => {
 
   const { id } = request.params;
 
-  const userIndex = users.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(user => user.id === id)
 
   if( userIndex < 0 ) {
     return response.status(400)
-      .json({error: "Project not found!!"})
+      .json({error: "User not found!!"})
   }
 
   const result = users[userIndex]
@@ -106,11 +106,11 @@ app.post("/api/users/:id/post", (request, response) => {
   const { id } = request.params;
   const { title, content, img, brief, refs } = request.body
 
-  const userIndex = users.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(user => user.id === id)
 
   if( userIndex < 0 ) {
     return response.status(400)
-      .json({error: "Project not found!!"})
+      .json({error: "User not found!!"})
   }
 
   const _post = {
@@ -136,11 +136,11 @@ app.put("/api/users/:id", (request, response) => {
   const { id } = request.params;
   const { name, content_type, username } = request.body;
 
-  const userIndex = users.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(user => user.id === id)
 
   if( userIndex < 0 ) {
     return response.status(400)
-      .json({error: "Project not found!!"})
+      .json({error: "User not found!!"})
   }
 
   const userUpdated = {
@@ -193,11 +193,11 @@ app.put("/api/users/:id/:postId", (request, response) => {
 app.delete("/api/users/:id", (request, response) => {
   const { id } = request.params;
 
-  const userIndex = users.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(user => user.id === id)
 
   if( userIndex < 0 ) {
     return response.status(400)
-      .json({error: "Project not found!!"})
+      .json({error: "User not found!!"})
   }
 
   users.splice(userIndex, 1)
