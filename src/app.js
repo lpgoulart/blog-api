@@ -47,6 +47,7 @@ app.use('/repositories/:id', validateId)
 const users = [];
 
 // Get all users
+// OK
 app.get("/api/users", (request, response) => {
 
   const {title} = request.query;
@@ -57,6 +58,7 @@ app.get("/api/users", (request, response) => {
   return response.json(result)
 });
 // Get single users
+// OK
 app.get("/api/users/:id", (request, response) => {
 
   const { id } = request.params;
@@ -73,6 +75,7 @@ app.get("/api/users/:id", (request, response) => {
   return response.json(result)
 });
 // Add new User
+// OK
 app.post("/api/users", (request, response) => {
   const { name, content_type, posts } = request.body
 
@@ -86,6 +89,7 @@ app.post("/api/users", (request, response) => {
     response.json(_user)
 });
 // Add Post to User
+// OK
 app.post("/api/users/:id/post", (request, response) => {
   const { id } = request.params;
   const { title, content, img, refs } = request.body
@@ -112,6 +116,7 @@ app.post("/api/users/:id/post", (request, response) => {
 
 });
 // Edit User Info
+// OK
 app.put("/api/users/:id", (request, response) => {
   const { id } = request.params;
   const { name, content_type } = request.body;
@@ -133,8 +138,8 @@ app.put("/api/users/:id", (request, response) => {
 
   return response.json(users[userIndex])
 });
-
 // Edit User Post
+// OK
 app.put("/api/users/:id/:postId", (request, response) => {
   const { id, postId } = request.params;
   const { title, content, img, refs } = request.body;
@@ -164,8 +169,8 @@ app.put("/api/users/:id/:postId", (request, response) => {
 
   return response.json(users[userIndex])
 });
-
 // Delete Users
+// OK
 app.delete("/api/users/:id", (request, response) => {
   const { id } = request.params;
 
@@ -178,6 +183,29 @@ app.delete("/api/users/:id", (request, response) => {
 
   users.splice(userIndex, 1)
   return response.status(204).send()
+});
+// Delete User Post
+// OK
+app.delete("/api/users/:id/:postId", (request, response) => {
+  const { id, postId } = request.params;
+
+  const userIndex = users.findIndex(user => user.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "User not found!!"})
+  }
+
+  const postIndex = users[userIndex].posts.items.findIndex( post => post.id === postId )
+
+  if( postIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Post not found!!"})
+  }
+
+  users[userIndex].posts.items_total -= 1;
+  users[userIndex].posts.items.splice(postIndex, 1);
+  return response.status(204).send();
 });
 
 module.exports = app;
