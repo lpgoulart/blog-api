@@ -16,7 +16,6 @@ function logRequest (request, response, next) {
   console.timeEnd(label)
 
 }
-
 function validateId(request, response, next) {
   const {id} = request.params;
 
@@ -26,99 +25,159 @@ function validateId(request, response, next) {
 
   return next()
 }
-
 app.use(logRequest)
 app.use('/repositories/:id', validateId)
 
-const repositories = [
-  {
-    "id": "814dcafc-d5cb-4815-b5eb-f3b5193a5e3f",
-    "title": "Project",
-    "url": "github.com/lpgoulart/project",
-    "techs": [
-      "JS",
-      "CSS",
-      "HTML"
-    ],
-    "image": "mexico.png",
-    "likes": 0
-  }
-];
+/*
+* ex de data
 
-app.get("/repositories", (request, response) => {
+{
+  id
+  content_type
+  name
+  posts : {
+    total
+    items: []
+  }
+  pages?
+}
+
+
+*/ 
+const users = [];
+
+// Get all users
+app.get("/api/users", (request, response) => {
 
   const {title} = request.query;
   const result = title
-    ? repositories.filter(projetc => project.title.includes(title))
-    : repositories
+    ? users.filter(projetc => project.title.includes(title))
+    : users
 
   return response.json(result)
 });
+// Get single users
+app.get("/api/users/:id", (request, response) => {
 
-app.post("/repositories", (request, response) => {
-  const { title, url, techs } = request.body
+  const { id } = request.params;
 
-    const repo = {
+  const userIndex = users.findIndex(project => project.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Project not found!!"})
+  }
+
+  const result = users[userIndex]
+
+  return response.json(result)
+});
+// Add new User
+app.post("/api/users", (request, response) => {
+  const { name, content_type, posts } = request.body
+
+    const _user = {
       id: uuid(),
-      title: title,
-      url: url,
-      techs: techs,
-      likes: 0
+      name: name,
+      content_type: content_type,
+      posts: posts,
     }
-    repositories.push(repo)
-    response.json(repo)
+    users.push(_user)
+    response.json(_user)
 });
-
-app.put("/repositories/:id", (request, response) => {
+// Add Post to User
+app.post("/api/users/:id/post", (request, response) => {
   const { id } = request.params;
-  const { title, url, techs } = request.body
+  const { title, content, img, refs } = request.body
 
-  const repoIndex = repositories.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(project => project.id === id)
 
-  if( repoIndex < 0 ) {
+  if( userIndex < 0 ) {
     return response.status(400)
       .json({error: "Project not found!!"})
   }
 
-  const project = {
+  const _post = {
+    id: uuid(),
+    title: title,
+    content: content,
+    img: img,
+    refs: refs
+  }
+
+  _posts = users[userIndex].posts.items_total += 1
+  _posts = users[userIndex].posts.items.push(_post)
+
+  response.json(users[userIndex])
+
+});
+// Edit User Info
+app.put("/api/users/:id", (request, response) => {
+  const { id } = request.params;
+  const { name, content_type } = request.body;
+
+  const userIndex = users.findIndex(project => project.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Project not found!!"})
+  }
+
+  const userUpdated = {
     id,
-    title,
-    url,
-    techs,
-    likes: repositories[repoIndex].likes
+    name: name == "" ? users[userIndex].name : name,
+    content_type: content_type == "" ? users[userIndex].content_type : content_type,
+    posts: users[userIndex].posts
   }
-  repositories[repoIndex] = project;
+  users[userIndex] = userUpdated;
 
-  return response.json(repositories[repoIndex])
+  return response.json(users[userIndex])
 });
 
-app.delete("/repositories/:id", (request, response) => {
+// Edit User Post
+app.put("/api/users/:id/:postId", (request, response) => {
+  const { id, postId } = request.params;
+  const { title, content, img, refs } = request.body;
+
+  const userIndex = users.findIndex(user => user.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "User not found!!"})
+  }
+
+  const postIndex = users[userIndex].posts.items.findIndex( post => post.id === postId )
+
+  if( postIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Post not found!!"})
+  }
+
+  const postUpdated = {
+    postId,
+    title: title == "" ? users[userIndex].posts.items[postIndex].title : title,
+    content: content == "" ? users[userIndex].posts.items[postIndex].content : content,
+    img: img == "" ? users[userIndex].posts.items[postIndex].img : img,
+    refs: refs == "" ? users[userIndex].posts.items[postIndex].refs : refs
+  }
+  users[userIndex].posts.items[postIndex] = postUpdated;
+
+  return response.json(users[userIndex])
+});
+
+// Delete Users
+app.delete("/api/users/:id", (request, response) => {
   const { id } = request.params;
 
-  const repoIndex = repositories.findIndex(project => project.id === id)
+  const userIndex = users.findIndex(project => project.id === id)
 
-  if( repoIndex < 0 ) {
+  if( userIndex < 0 ) {
     return response.status(400)
       .json({error: "Project not found!!"})
   }
 
-  repositories.splice(repoIndex, 1)
+  users.splice(userIndex, 1)
   return response.status(204).send()
-});
-
-app.post("/repositories/:id/like", (request, response) => {
-  const { id } = request.params;
-
-  const repoIndex = repositories.findIndex(project => project.id === id)
-
-  if( repoIndex < 0 ) {
-    return response.status(400)
-      .json({error: "Project not found!!"})
-  }
-
-  repositories[repoIndex].likes += 1;
-
-  return response.json(repositories[repoIndex])
 });
 
 module.exports = app;
