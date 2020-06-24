@@ -92,7 +92,7 @@ app.post("/api/users", (request, response) => {
 // OK
 app.post("/api/users/:id/post", (request, response) => {
   const { id } = request.params;
-  const { title, content, img, refs } = request.body
+  const { title, content, img, brief, refs } = request.body
 
   const userIndex = users.findIndex(project => project.id === id)
 
@@ -103,10 +103,11 @@ app.post("/api/users/:id/post", (request, response) => {
 
   const _post = {
     id: uuid(),
-    title: title,
-    content: content,
-    img: img,
-    refs: refs
+    title,
+    content,
+    brief,
+    img,
+    refs
   }
 
   _posts = users[userIndex].posts.items_total += 1
@@ -142,7 +143,7 @@ app.put("/api/users/:id", (request, response) => {
 // OK
 app.put("/api/users/:id/:postId", (request, response) => {
   const { id, postId } = request.params;
-  const { title, content, img, refs } = request.body;
+  const { title, content, img, brief, refs } = request.body;
 
   const userIndex = users.findIndex(user => user.id === id)
 
@@ -161,6 +162,7 @@ app.put("/api/users/:id/:postId", (request, response) => {
   const postUpdated = {
     postId,
     title: title == "" ? users[userIndex].posts.items[postIndex].title : title,
+    brief: brief == "" ? users[userIndex].posts.items[postIndex].brief : brief,
     content: content == "" ? users[userIndex].posts.items[postIndex].content : content,
     img: img == "" ? users[userIndex].posts.items[postIndex].img : img,
     refs: refs == "" ? users[userIndex].posts.items[postIndex].refs : refs
@@ -207,7 +209,6 @@ app.delete("/api/users/:id/:postId", (request, response) => {
   users[userIndex].posts.items.splice(postIndex, 1);
   return response.status(204).send();
 });
-
 // Delete User Post
 // OK
 app.get("/api/users/:id/:postId", (request, response) => {
