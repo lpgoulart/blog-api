@@ -112,7 +112,7 @@ app.post("/api/users/:id/post", (request, response) => {
   _posts = users[userIndex].posts.items_total += 1
   _posts = users[userIndex].posts.items.push(_post)
 
-  response.json(users[userIndex])
+  response.json(_post)
 
 });
 // Edit User Info
@@ -206,6 +206,30 @@ app.delete("/api/users/:id/:postId", (request, response) => {
   users[userIndex].posts.items_total -= 1;
   users[userIndex].posts.items.splice(postIndex, 1);
   return response.status(204).send();
+});
+
+// Delete User Post
+// OK
+app.get("/api/users/:id/:postId", (request, response) => {
+  const { id, postId } = request.params;
+
+  const userIndex = users.findIndex(user => user.id === id)
+
+  if( userIndex < 0 ) {
+    return response.status(400)
+      .json({error: "User not found!!"})
+  }
+
+  const postIndex = users[userIndex].posts.items.findIndex( post => post.id === postId )
+
+  if( postIndex < 0 ) {
+    return response.status(400)
+      .json({error: "Post not found!!"})
+  }
+
+  post = users[userIndex].posts.items[postIndex]
+
+  return response.json(post);
 });
 
 module.exports = app;
