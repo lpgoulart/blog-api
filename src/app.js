@@ -104,7 +104,7 @@ app.post("/api/users", (request, response) => {
 // OK
 app.post("/api/users/:id/post", (request, response) => {
   const { id } = request.params;
-  const { title, content, img, brief, refs } = request.body
+  const { title, content, img, brief, type } = request.body
 
   const userIndex = users.findIndex(user => user.id === id)
 
@@ -120,7 +120,7 @@ app.post("/api/users/:id/post", (request, response) => {
     content,
     brief,
     img,
-    refs
+    type
   }
 
   _posts = users[userIndex].posts.items_total += 1
@@ -159,7 +159,7 @@ app.put("/api/users/:id", (request, response) => {
 // OK
 app.put("/api/users/:id/:postId", (request, response) => {
   const { id, postId } = request.params;
-  const { title, content, img, brief, refs, createdAt } = request.body;
+  const { title, content, img, brief, type, createdAt } = request.body;
 
   const userIndex = users.findIndex(user => user.id === id)
 
@@ -182,7 +182,7 @@ app.put("/api/users/:id/:postId", (request, response) => {
     brief: brief == "" ? users[userIndex].posts.items[postIndex].brief : brief,
     content: content == "" ? users[userIndex].posts.items[postIndex].content : content,
     img: img == "" ? users[userIndex].posts.items[postIndex].img : img,
-    refs: refs == "" ? users[userIndex].posts.items[postIndex].refs : refs
+    type: type == "" ? users[userIndex].posts.items[postIndex].type : type
   }
   users[userIndex].posts.items[postIndex] = postUpdated;
 
