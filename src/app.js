@@ -176,7 +176,7 @@ app.put("/api/users/:id/:postId", (request, response) => {
   }
 
   const postUpdated = {
-    postId,
+    id: postId,
     createdAt,
     title: title == "" ? users[userIndex].posts.items[postIndex].title : title,
     brief: brief == "" ? users[userIndex].posts.items[postIndex].brief : brief,
