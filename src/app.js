@@ -115,6 +115,7 @@ app.post("/api/users/:id/post", (request, response) => {
 
   const _post = {
     id: uuid(),
+    createdAt: Date.now(),
     title,
     content,
     brief,
@@ -158,7 +159,7 @@ app.put("/api/users/:id", (request, response) => {
 // OK
 app.put("/api/users/:id/:postId", (request, response) => {
   const { id, postId } = request.params;
-  const { title, content, img, brief, refs } = request.body;
+  const { title, content, img, brief, refs, createdAt } = request.body;
 
   const userIndex = users.findIndex(user => user.id === id)
 
@@ -176,6 +177,7 @@ app.put("/api/users/:id/:postId", (request, response) => {
 
   const postUpdated = {
     postId,
+    createdAt,
     title: title == "" ? users[userIndex].posts.items[postIndex].title : title,
     brief: brief == "" ? users[userIndex].posts.items[postIndex].brief : brief,
     content: content == "" ? users[userIndex].posts.items[postIndex].content : content,
