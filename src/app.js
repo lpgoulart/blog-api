@@ -25,6 +25,7 @@ function validateId(request, response, next) {
 
   return next()
 }
+
 app.use(logRequest)
 app.use('/api/users/:id', validateId)
 
@@ -88,13 +89,34 @@ app.get("/api/users/:id/:postId", (request, response) => {
 // Add new User
 // OK
 app.post("/api/users", (request, response) => {
-  const { name, content_type, username, posts } = request.body
+  const { name, blog_name, username, posts, plan_total } = request.body
+
+  let plan
+
+  switch(plan_total) {
+    case 'free':
+      plan = 10
+      break;
+    case 'simple':
+      plan = 70
+      break;
+    case 'pro':
+      plan = 200
+      break;
+    case 'enterprise':
+      plan = 9999
+      break;
+    default:
+      plan = 10
+      break
+  }
 
     const _user = {
       id: uuid(),
       name,
-      username, 
-      content_type,
+      username,
+      plan_total: plan, 
+      blog_name,
       posts,
     }
     users.push(_user)
@@ -123,10 +145,17 @@ app.post("/api/users/:id/post", (request, response) => {
     type
   }
 
-  _posts = users[userIndex].posts.items_total += 1
-  _posts = users[userIndex].posts.items.push(_post)
+  if ( users[userIndex].plan_total == users[userIndex].posts.items_total ) {
+    response.json({
+      message: "Vc atingiu o numero total de posts"
+    })
+  }
+  else {
+    _posts = users[userIndex].posts.items_total += 1
+    _posts = users[userIndex].posts.items.push(_post)
 
-  response.json(_post)
+    response.json(_post)
+  }
 
 });
 
@@ -135,7 +164,7 @@ app.post("/api/users/:id/post", (request, response) => {
 // OK
 app.put("/api/users/:id", (request, response) => {
   const { id } = request.params;
-  const { name, content_type, username } = request.body;
+  const { name, blog_name, username } = request.body;
 
   const userIndex = users.findIndex(user => user.id === id)
 
@@ -148,7 +177,7 @@ app.put("/api/users/:id", (request, response) => {
     id,
     username: username == "" ? users[userIndex].username : username,
     name: name == "" ? users[userIndex].name : name,
-    content_type: content_type == "" ? users[userIndex].content_type : content_type,
+    blog_name: blog_name == "" ? users[userIndex].blog_name : blog_name,
     posts: users[userIndex].posts
   }
   users[userIndex] = userUpdated;
@@ -228,6 +257,5 @@ app.delete("/api/users/:id/:postId", (request, response) => {
   users[userIndex].posts.items.splice(postIndex, 1);
   return response.status(204).send();
 });
-
 
 module.exports = app;
