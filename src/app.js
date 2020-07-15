@@ -7,6 +7,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+setInterval(()=>{
+  console.log('working just fine')
+}, 1200000)
+
 function logRequest (request, response, next) {
   const {method, url} = request;
   const label = `[${method.toUpperCase()}] ${url}`
@@ -34,7 +38,7 @@ const users = [];
 // Get all users
 // OK
 app.get("/api/users", (request, response) => {
-
+  console.log('working just fine');
   const {title} = request.query;
   const result = title
     ? users.filter(user => user.title.includes(title))
